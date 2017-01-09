@@ -1244,6 +1244,20 @@ func TestTrashClear(t *testing.T) {
 
 }
 
+func TestDestroyFileWrongID(t *testing.T) {
+	path := "/files/trash/not-an-id"
+	req, err := http.NewRequest(http.MethodDelete, ts.URL+path, nil)
+	if !assert.NoError(t, err) {
+		return
+	}
+	res, err := http.DefaultClient.Do(req)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	assert.Equal(t, 404, res.StatusCode)
+}
+
 func TestDestroyFile(t *testing.T) {
 	body := "foo,bar"
 	res1, data1 := upload(t, "/files/?Type=file&Name=tolistfile", "text/plain", body, "UmfjCVWct/albVkURcJJfg==")
