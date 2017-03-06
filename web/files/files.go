@@ -686,6 +686,8 @@ func wrapVfsError(err error) error {
 		return jsonapi.BadRequest(err)
 	case vfs.ErrDirNotEmpty:
 		return jsonapi.BadRequest(err)
+	case permissions.ErrForbidden:
+		return jsonapi.Forbidden(err)
 	}
 	return err
 }
@@ -748,11 +750,14 @@ func checkIfMatch(c echo.Context, rev string) error {
 }
 
 func checkPerm(c echo.Context, v pkgperm.Verb, d *vfs.DirDoc, f *vfs.FileDoc) error {
+	var err error
 	if d != nil {
-		return permissions.AllowVFS(c, v, d)
+		err = permissions.AllowVFS(c, v, d)
+	} else {
+		err = permissions.AllowVFS(c, v, f)
 	}
 
-	return permissions.AllowVFS(c, v, f)
+	return wrapVfsError(err)
 }
 
 func parseMD5Hash(md5B64 string) ([]byte, error) {

@@ -10,6 +10,10 @@ import (
 	"github.com/labstack/echo"
 )
 
+// ErrForbidden is the error returned when permissions does not allow the
+// reques.
+var ErrForbidden = echo.NewHTTPError(http.StatusForbidden)
+
 // AllowWholeType validates that the context permission set can use a verb on
 // the whold doctype
 func AllowWholeType(c echo.Context, v permissions.Verb, doctype string) error {
@@ -19,7 +23,7 @@ func AllowWholeType(c echo.Context, v permissions.Verb, doctype string) error {
 	}
 
 	if !pdoc.Permissions.AllowWholeType(v, doctype) {
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	return nil
 }
@@ -32,7 +36,7 @@ func Allow(c echo.Context, v permissions.Verb, o permissions.Validable) error {
 	}
 
 	if !pdoc.Permissions.Allow(v, o) {
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	return nil
 }
@@ -44,7 +48,7 @@ func AllowTypeAndID(c echo.Context, v permissions.Verb, doctype, id string) erro
 		return err
 	}
 	if !pdoc.Permissions.AllowID(v, doctype, id) {
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	return nil
 }
@@ -58,7 +62,7 @@ func AllowVFS(c echo.Context, v permissions.Verb, o vfs.Validable) error {
 	}
 	err = vfs.Allows(instance, *pdoc.Permissions, v, o)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	return nil
 }
@@ -77,13 +81,13 @@ func AllowInstallApp(c echo.Context, v permissions.Verb) error {
 		// OK
 	case permissions.TypeApplication:
 		if pdoc.SourceID != sourceID {
-			return echo.NewHTTPError(http.StatusForbidden)
+			return ErrForbidden
 		}
 	default:
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	if !pdoc.Permissions.AllowWholeType(v, consts.Apps) {
-		return echo.NewHTTPError(http.StatusForbidden)
+		return ErrForbidden
 	}
 	return nil
 }

@@ -124,3 +124,13 @@ func InvalidAttribute(attribute string, err error) *Error {
 		},
 	}
 }
+
+// Forbidden returns a 403 formatted error when the requests doesnt have
+// necessary permissions
+func Forbidden(err error) *Error {
+	return &Error{
+		Status: http.StatusForbidden,
+		Title:  "Forbidden",
+		Detail: "The token does not have the right to perform the request",
+	}
+}
